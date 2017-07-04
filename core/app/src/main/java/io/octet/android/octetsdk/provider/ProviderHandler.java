@@ -9,13 +9,13 @@ import android.os.RemoteException;
 import java.security.SecureRandom;
 
 import io.octet.android.octetsdk.AccountInfo;
-import io.octet.android.octetsdk.PRunnable;
+import io.octet.android.octetsdk.ResultCallback;
 
 import static io.octet.android.octetsdk.provider.ServiceProvider.*;
 
 public class ProviderHandler extends Handler {
     private final ServiceProvider serviceProvider;
-    private final Provider provider;
+    private final AsyncProvider provider;
     private final SecureRandom RANDOM = new SecureRandom();
 
     public ProviderHandler(ServiceProvider serviceProvider) {
@@ -30,15 +30,21 @@ public class ProviderHandler extends Handler {
 
         switch (msg.what) {
             case REQUEST_LINK:
-                provider.requestLink(new PRunnable<Boolean>() {
+                provider.requestLink(new ResultCallback<Boolean>() {
                     @Override
-                    public void run(Boolean result) {
-                        long nextID;
-                        do {
-                            nextID = RANDOM.nextLong();
-                        } while (serviceProvider.hasID(nextID));
-
+                    public void completed(Boolean result) {
                         try {
+                            if (!result) {
+                                Message failMsg = Message.obtain(null, LINK_FAILED);
+                                msg.replyTo.send(failMsg);
+                                return;
+                            }
+
+                            long nextID;
+                            do {
+                                nextID = RANDOM.nextLong();
+                            } while (serviceProvider.hasID(nextID));
+
                             serviceProvider.link(nextID, msg.replyTo);
                         } catch (RemoteException e) {
                             e.printStackTrace();
@@ -47,9 +53,9 @@ public class ProviderHandler extends Handler {
                 });
                 break;
             case DEFAULT_ACCOUNT:
-                provider.defaultAccount(new PRunnable<AccountInfo>() {
+                provider.defaultAccount(new ResultCallback<AccountInfo>() {
                     @Override
-                    public void run(AccountInfo result) {
+                    public void completed(AccountInfo result) {
                         Messenger client = serviceProvider.getClient((Long)msg.obj);
 
                         Message msg = Message.obtain(null, DEFAULT_ACCOUNT, result);

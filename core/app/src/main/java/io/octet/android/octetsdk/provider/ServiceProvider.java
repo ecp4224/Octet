@@ -13,12 +13,17 @@ import android.support.v4.util.LongSparseArray;
 public class ServiceProvider extends Service {
     public static final int REQUEST_LINK = 1;
     public static final int LINK_SUCCESS = 2;
-    public static final int DEFAULT_ACCOUNT = 3;
+    public static final int LINK_FAILED = 3;
+    public static final int DEFAULT_ACCOUNT = 4;
 
     private final LongSparseArray<Messenger> clients = new LongSparseArray<>();
-    private Provider provider;
-    public ServiceProvider(Provider provider) {
+    private AsyncProvider provider;
+    public ServiceProvider(AsyncProvider provider) {
         this.provider = provider;
+    }
+
+    public ServiceProvider(Provider provider) {
+        this.provider = ProviderHelper.wrap(provider);
     }
 
 
@@ -43,7 +48,7 @@ public class ServiceProvider extends Service {
         replyTo.send(msg);
     }
 
-    public Provider getProvider() {
+    public AsyncProvider getProvider() {
         return provider;
     }
 

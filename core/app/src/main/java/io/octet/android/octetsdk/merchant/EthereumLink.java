@@ -11,7 +11,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import io.octet.android.octetsdk.AccountInfo;
-import io.octet.android.octetsdk.PRunnable;
+import io.octet.android.octetsdk.ResultCallback;
 import io.octet.android.octetsdk.provider.ServiceProvider;
 
 public final class EthereumLink {
@@ -120,9 +120,9 @@ public final class EthereumLink {
         return linkState;
     }
 
-    private PRunnable<AccountInfo> callback;
+    private ResultCallback<AccountInfo> callback;
     //TODO Should this class poll data every m seconds and provide a stateful API?
-    public void defaultAccount(PRunnable<AccountInfo> callback) {
+    public void defaultAccount(ResultCallback<AccountInfo> callback) {
         this.callback = callback;
 
         Message msg = Message.obtain(null, ServiceProvider.DEFAULT_ACCOUNT, id);
@@ -134,9 +134,9 @@ public final class EthereumLink {
         }
     }
 
-    public void updateDefaultAccount(AccountInfo defaultAccount) {
+    void updateDefaultAccount(AccountInfo defaultAccount) {
         if (this.callback != null) {
-            callback.run(defaultAccount);
+            callback.completed(defaultAccount);
         }
 
         this.defaultAccount = defaultAccount;
