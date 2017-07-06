@@ -2,9 +2,6 @@ package io.octet.android.octetsdk.provider;
 
 
 import android.content.Intent;
-import android.os.Parcelable;
-
-import org.ethereum.geth.AccountManager;
 import org.ethereum.geth.Address;
 
 import java.io.File;
@@ -24,17 +21,22 @@ import java.io.Serializable;
 public class LinkInfo implements Serializable {
     public static final String EXTRA_ID = "io.octet.android.LINKINFO";
 
+    //OPTION 1
     private String filePath;
     private long accountIndex;
-    private Address accountAddress;
+
+    //OPTION 2
+    private byte[] exportedAccount;
+    private String exportedPassword;
 
     public LinkInfo(String filePath, long accountIndex) {
         this.filePath = filePath;
         this.accountIndex = accountIndex;
     }
 
-    public LinkInfo(Address address) {
-        this.accountAddress = address;
+    public LinkInfo(byte[] exportedAccount, String exportedPassword) {
+        this.exportedAccount = exportedAccount;
+        this.exportedPassword = exportedPassword;
     }
 
     /**
@@ -53,16 +55,20 @@ public class LinkInfo implements Serializable {
         return accountIndex;
     }
 
-    public Address getAccountAddress() {
-        return accountAddress;
+    public byte[] getExportedAccount() {
+        return exportedAccount;
+    }
+
+    public String getExportedPassword() {
+        return exportedPassword;
     }
 
     /**
      * Whether the wallet app has given us keystore access, or if they are
      * REEEEEEEEE
      *
-     * If no access is provided, then {@link LinkInfo#getAccountAddress()}
-     * will return a valid address
+     * If no access is provided, then {@link LinkInfo#getExportedAccount()}
+     * will return a valid exported account
      * @return Whether keystore access was granted
      */
     public boolean hasKeystoreAccess() {

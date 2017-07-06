@@ -4,6 +4,7 @@ package io.octet.android.octetsdk.merchant;
 import android.app.Activity;
 import android.content.Intent;
 
+import org.ethereum.geth.Account;
 import org.ethereum.geth.Address;
 import org.ethereum.geth.BigInt;
 import org.ethereum.geth.EthereumClient;
@@ -88,8 +89,14 @@ public final class EthereumLink extends Activity {
             File file = new File(getFilesDir(), ".octet");
             try {
                 Node node = Geth.newNode(file.getAbsolutePath(), new NodeConfig());
+                KeyStore accountManager = Geth.newKeyStore(
+                        file.getAbsolutePath(), Geth.LightScryptN, Geth.LightScryptP
+                );
+                Account linkedAccount = accountManager.importKey(
+                        info.getExportedAccount(), info.getExportedPassword(), "OCTET"
+                );
 
-                this.linkedAccount = info.getAccountAddress();
+                this.linkedAccount = linkedAccount.getAddress();
 
                 node.start();
 
