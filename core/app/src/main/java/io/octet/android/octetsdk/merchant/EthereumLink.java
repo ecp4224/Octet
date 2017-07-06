@@ -1,144 +1,109 @@
 package io.octet.android.octetsdk.merchant;
 
 
-import android.content.ComponentName;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 
-import io.octet.android.octetsdk.AccountInfo;
-import io.octet.android.octetsdk.ResultCallback;
-import io.octet.android.octetsdk.provider.ServiceProvider;
+import org.ethereum.geth.Address;
+import org.ethereum.geth.BigInt;
+import org.ethereum.geth.EthereumClient;
+import org.ethereum.geth.Geth;
+import org.ethereum.geth.KeyStore;
+import org.ethereum.geth.Node;
+import org.ethereum.geth.NodeConfig;
 
-public final class EthereumLink {
-    public static final String ACTION_LINK = "io.octet.android.LINK";
+import java.io.File;
+import java.security.SecureRandom;
 
-    public static final int NOT_LINKED = 0;
-    public static final int REQUESTING_LINK = 1;
-    public static final int ESTABLISHING_LINK = 2;
-    public static final int LINKED = 3;
+import io.octet.android.octetsdk.provider.LinkInfo;
 
+public final class EthereumLink extends Activity {
+    public static final String ACTION_REQUEST = "org.ethereum.LINK_REQUEST";
 
-    private Messenger provider;
-    private Context androidContext;
-    private int linkState = NOT_LINKED;
-    private final Messenger messenger = new Messenger(new LinkHandler(this));
-    private final ServiceConnection link = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            provider = new Messenger(service);
-
-            try {
-                link();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            provider = null;
-        }
-    };
-    private long id;
-
-    private AccountInfo defaultAccount;
+    private final SecureRandom RANDOM = new SecureRandom();
+    private int id;
+    private EthereumClient gethClient;
+    private Address linkedAccount;
 
     /**
      * Request a link to the Ethereum network with any app/service providing a link. The
      * link may not be established after this function call is complete
-     * @param context The app's context
      * @return A new {@link EthereumLink}.
      */
-    public static EthereumLink requestLink(Context context) {
+    public static EthereumLink requestLink() {
         EthereumLink link = new EthereumLink();
-        link.bindRequest(context);
+        link.bindRequest();
 
         return link;
     }
 
-    /**
-     * Request a link to the Ethereum network with a specific {@link ServiceProvider}. The
-     * link may not be established after this function call is complete
-     * @param context The app's context
-     * @param class_ The class of the {@link ServiceProvider} to link to
-     * @return A new {@link EthereumLink}.
-     */
-    public static EthereumLink link(Context context, Class<? extends ServiceProvider> class_) {
-        EthereumLink link = new EthereumLink();
-        link.bind(context, class_);
-
-        return link;
-    }
-
-    private void bind(Context androidContext, Class<? extends ServiceProvider> class_) {
-        this.androidContext = androidContext;
-
-        Intent bindIntent = new Intent(androidContext, class_);
-        this.androidContext.bindService(bindIntent, link,
-                //TODO Figure out which flags to use here
-                Context.BIND_ABOVE_CLIENT | Context.BIND_AUTO_CREATE
-        );
-        linkState = REQUESTING_LINK;
-    }
-
-    private void bindRequest(Context androidContext) {
-        this.androidContext = androidContext;
-
-        Intent bindIntent = new Intent(ACTION_LINK);
-        this.androidContext.bindService(bindIntent, link,
-                //TODO Figure out which flags to use here
-                Context.BIND_ABOVE_CLIENT | Context.BIND_AUTO_CREATE
-        );
-        linkState = REQUESTING_LINK;
+    private void bindRequest() {
+        this.id = RANDOM.nextInt();
+        Intent linkIntent = new Intent(ACTION_REQUEST);
+        startActivityForResult(linkIntent, this.id);
     }
 
     private EthereumLink() { }
 
-    private void link() throws RemoteException {
-        Message msg = Message.obtain(null, ServiceProvider.REQUEST_LINK);
-        msg.replyTo = messenger;
-        provider.send(msg);
-        linkState = ESTABLISHING_LINK;
-    }
+    @Override
+    public void onActivityResult(int requestCode,
+                                 int resultCode,
+                                 Intent data) {
+        if (requestCode != id)
+            return; //This isn't our result
 
-    void completeLink(long id) {
-        linkState = LINKED;
+        if (resultCode == RESULT_CANCELED)
+            return; //The result was canceled
 
-        this.id = id;
-    }
+        if (!data.hasExtra(LinkInfo.EXTRA_ID))
+            return; //The result doesn't contain any info
 
-    public boolean isLinked() {
-        return linkState == 3;
-    }
+        LinkInfo info = (LinkInfo) data.getExtras().getSerializable(LinkInfo.EXTRA_ID);
 
-    public int getLinkedState() {
-        return linkState;
-    }
+        if (info == null)
+            return; //The result contains a null value
 
-    private ResultCallback<AccountInfo> callback;
-    //TODO Should this class poll data every m seconds and provide a stateful API?
-    public void defaultAccount(ResultCallback<AccountInfo> callback) {
-        this.callback = callback;
 
-        Message msg = Message.obtain(null, ServiceProvider.DEFAULT_ACCOUNT, id);
-        try {
-            provider.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            linkState = NOT_LINKED;
+        if (info.hasKeystoreAccess()) {
+            File file = info.getFile();
+
+            try {
+                Node node = Geth.newNode(file.getAbsolutePath(), new NodeConfig());
+                KeyStore accountManager = Geth.newKeyStore(
+                        file.getAbsolutePath(), Geth.LightScryptN, Geth.LightScryptP
+                );
+
+                this.linkedAccount = accountManager
+                        .getAccounts()
+                        .get(info.getAccountIndex())
+                        .getAddress();
+
+                node.start();
+
+                gethClient = node.getEthereumClient();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            File file = new File(getFilesDir(), ".octet");
+            try {
+                Node node = Geth.newNode(file.getAbsolutePath(), new NodeConfig());
+
+                this.linkedAccount = info.getAccountAddress();
+
+                node.start();
+
+                gethClient = node.getEthereumClient();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
+        finish();
     }
 
-    void updateDefaultAccount(AccountInfo defaultAccount) {
-        if (this.callback != null) {
-            callback.completed(defaultAccount);
-        }
-
-        this.defaultAccount = defaultAccount;
+    public void sendTransaction(double amount, Address sendTo) throws Exception {
+        //TODO Implement a UI confirmation with options
+        //TODO Implement actual transaction using Geth.newTransaction
     }
 }
