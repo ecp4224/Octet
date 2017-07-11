@@ -25,20 +25,4 @@ public class ExampleInstrumentedTest {
 
         assertEquals("io.octet.android.octetsdk", appContext.getPackageName());
     }
-
-    @Test
-    public void testLink() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        EthereumLink link = EthereumLink.requestLink(appContext);
-
-        link.defaultAccount(new ResultCallback<AccountInfo>() {
-            @Override
-            public void completed(AccountInfo result) {
-
-            }
-        });
-
-        AccountInfo info = link.defaultAccount();
-    }
 }

@@ -21,8 +21,10 @@ import java.io.Serializable;
 public class LinkInfo implements Serializable {
     public static final String EXTRA_ID = "io.octet.android.LINKINFO";
 
+
     //OPTION 1
     private String filePath;
+    private boolean fingerprintLocked;
     private long accountIndex;
 
     //OPTION 2
@@ -30,10 +32,22 @@ public class LinkInfo implements Serializable {
     private String exportedPassword;
 
     public LinkInfo(String filePath, long accountIndex) {
-        this.filePath = filePath;
-        this.accountIndex = accountIndex;
+        this(filePath, accountIndex, false);
     }
 
+    public LinkInfo(String filePath, long accountIndex, boolean fingerprintLocked) {
+        this.filePath = filePath;
+        this.accountIndex = accountIndex;
+        this.fingerprintLocked = fingerprintLocked;
+    }
+
+    /**
+     *
+     * @param exportedAccount
+     * @param exportedPassword
+     * @deprecated This method is insecure
+     */
+    @Deprecated
     public LinkInfo(byte[] exportedAccount, String exportedPassword) {
         this.exportedAccount = exportedAccount;
         this.exportedPassword = exportedPassword;
@@ -61,6 +75,10 @@ public class LinkInfo implements Serializable {
 
     public String getExportedPassword() {
         return exportedPassword;
+    }
+
+    public boolean isFingerprintLocked() {
+        return fingerprintLocked;
     }
 
     /**

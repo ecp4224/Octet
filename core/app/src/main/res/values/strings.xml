@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">OctetSDK</string>
+    <string name="cancel">Cancel</string>
+    <string name="authorize">Authorize</string>
+    <string name="password">Password</string>
+    <string name="MERCHANT_NAME">io.octet.android.octetsdk.merchant_name</string>
+    <string name="MERCHANT_PACKAGE">io.octet.android.octetsdk.merchant_package</string>
+    <string name="TRANSACTION_AMOUNT">io.octet.android.octetsdk.transaction_amount</string>
+    <string name="TRANSACTION_SENDTO">io.octet.android.octetsdk.transaction_sendTo</string>
+    <string name="ACCOUNT_NAME">io.octet.android.octetsdk.ACCOUNT_NAME</string>
+    <string name="ACCOUNT_ADDRESS">io.octet.android.octetsdk.ACCOUNT_ADDRESS</string>
+    <string name="ACCOUNT_PASSWORD">io.octet.android.octetsdk.ACCOUNT_PASSWORD</string>
 </resources>
