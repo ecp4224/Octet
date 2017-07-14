@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.Dialog"
+    android:excludeFromRecents="true"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp">
+
+    <RelativeLayout
+        android:paddingTop="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/merchant_image"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:src="@drawable/google"
+            app:civ_border_width="0dp"
+            android:layout_centerHorizontal="true"
+            app:civ_border_color="#FF000000"/>
+
+        <TextView
+            android:id="@+id/merchant_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/merchant_image"
+            android:paddingTop="5dp"
+            android:textColor="#000"
+            android:textAlignment="center"
+            android:text="Google would like to make a transaction"/>
+
+        <TextView
+            android:id="@+id/merchant_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/merchant_text"
+            android:paddingTop="5dp"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:text="0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:paddingTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/eth_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_centerHorizontal="true"
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="1.567 ETH"/>
+    </RelativeLayout>
+
+    <include layout="@layout/account_info" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_centerHorizontal="true"
+            android:paddingTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="200dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:textSize="12sp"
+                android:hint="@string/password"
+                android:inputType="textPassword"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/cancel_btn"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/cancel"/>
+
+                <Button
+                    android:id="@+id/auth_btn"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#fff"
+                    android:text="@string/authorize"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

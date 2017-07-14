@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:theme="@android:style/Theme.Dialog"
+    android:excludeFromRecents="true"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp">
+
+    <RelativeLayout
+        android:paddingTop="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/merchant_image"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:src="@drawable/google"
+            app:civ_border_width="0dp"
+            android:layout_centerHorizontal="true"
+            app:civ_border_color="#FF000000"/>
+
+        <TextView
+            android:id="@+id/merchant_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/merchant_image"
+            android:paddingTop="5dp"
+            android:textColor="#000"
+            android:textAlignment="center"
+            android:text="Google would like to link to a wallet"/>
+
+        <TextView
+            android:id="@+id/merchant_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/merchant_text"
+            android:paddingTop="5dp"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:text="This does not unlock the account"/>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:paddingTop="10dp"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/wallet_list"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+</LinearLayout>

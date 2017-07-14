@@ -1,0 +1,1 @@
+include ':octetsdk', ':examples:SimpleWallet', ':examples:SimpleMerchant'
