@@ -35,11 +35,11 @@ public class Blockies {
         randseed[3] = (randseed[3] ^ (randseed[3] >> 19) ^ t ^ (t >> 8));
 
         float temp = (float)(randseed[3] >>> 0) / ((1 << 31) >>> 0);
-        return temp;
+        return Math.abs(temp);
     }
 
     private float[] createColor() {
-        float h = (float) Math.floor(rand() * 360);
+        float h = (float) Math.floor(rand() * 360f);
 
         float s = ((rand() * 60f) + 40f);
 
@@ -113,7 +113,6 @@ public class Blockies {
         int color = Color.HSVToColor(options.color);
         int spotColor = Color.HSVToColor(options.spotColor);
 
-        canvas.drawColor(color);
         myPaint.setColor(color);
 
         for (int i = 0; i < imageData.length; i++) {
@@ -125,7 +124,6 @@ public class Blockies {
 
                 int drawColor = pixel == 1 ? color : spotColor;
 
-                canvas.drawColor(drawColor);
                 myPaint.setColor(drawColor);
 
                 canvas.drawRect(col * options.scale, row * options.scale, options.scale, options.scale, myPaint);

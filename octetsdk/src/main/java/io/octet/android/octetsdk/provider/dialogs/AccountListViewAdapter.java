@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.ethereum.geth.Account;
@@ -54,7 +55,7 @@ public class AccountListViewAdapter extends ArrayAdapter<Account> {
         if (convertView == null) {
             holder = new ViewHolder();
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.account_info, parent, false);
-            holder.imageView = (CircleImageView) convertView.findViewById(R.id.account_image);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.account_image);
             holder.address = (TextView) convertView.findViewById(R.id.account_address);
             holder.name = (TextView) convertView.findViewById(R.id.account_name);
 
@@ -66,7 +67,7 @@ public class AccountListViewAdapter extends ArrayAdapter<Account> {
         holder.address.setText(account.getAddress().getHex());
         holder.name.setText(account.toString()); //TODO How do we get the name?
 
-        Bitmap bmp = BLOCKIES.createIcon(account.getAddress().getHex());
+        Bitmap bmp = BLOCKIES.createIcon(account.getAddress().getHex(), 4, 2);
 
         holder.imageView.setImageBitmap(bmp);
 
@@ -74,7 +75,7 @@ public class AccountListViewAdapter extends ArrayAdapter<Account> {
     }
 
     private final class ViewHolder {
-        public CircleImageView imageView;
+        public ImageView imageView;
         public TextView address;
         public TextView name;
     }
